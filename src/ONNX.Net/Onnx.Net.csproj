@@ -4,6 +4,7 @@
     <TargetFramework>netstandard2.1</TargetFramework>
     <RootNamespace>Onnx</RootNamespace>
     <AssemblyName>Onnx.Net</AssemblyName>
+    <PackageVersion>3.0.1</PackageVersion>
   </PropertyGroup>
 
   <ItemGroup>
@@ -43,7 +44,7 @@
     <PackageReference Include="protobuf-net" Version="3.0.73" />
   </ItemGroup>
 
-  <Target Name="PreBuild" BeforeTargets="PreBuildEvent">
-    <Exec Command="protogen onnx-data.proto3 onnx-ml.proto3 onnx-operators-ml.proto3 --proto_path=./onnx --csharp_out=./Models --package=onnx" />
-  </Target>
+<!--  <Target Name="PreBuild" BeforeTargets="PreBuildEvent">-->
+<!--    <Exec Command="protogen onnx-data.proto3 onnx-ml.proto3 onnx-operators-ml.proto3 &#45;&#45;proto_path=./onnx &#45;&#45;csharp_out=./Models &#45;&#45;package=onnx" />-->
+<!--  </Target>-->
 </Project>
