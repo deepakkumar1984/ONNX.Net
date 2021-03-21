@@ -168,7 +168,7 @@ namespace Onnx
             throw new NotImplementedException();
         }
 
-        public static string PrintableDim(TensorShapeProto.Dimension dim)
+        public static string PrintableDim(TensorShapeProto.Types.Dimension dim)
         {
             throw new NotImplementedException();
         }

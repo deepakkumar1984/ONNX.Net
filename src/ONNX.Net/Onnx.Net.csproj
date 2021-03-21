@@ -8,6 +8,9 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Models1\onnx-data.cs" />
+    <Compile Remove="Models1\onnx-ml.cs" />
+    <Compile Remove="Models1\onnx-operators-ml.cs" />
     <Compile Remove="PyRef\external_data_helper.py.cs" />
     <Compile Remove="PyRef\gen_proto.py.cs" />
     <Compile Remove="PyRef\helper.py.cs" />
@@ -21,6 +24,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="Models1\" />
     <Folder Include="Models\" />
   </ItemGroup>
 
@@ -41,7 +45,6 @@
     <PackageReference Include="Google.Protobuf" Version="3.15.6" />
     <PackageReference Include="Microsoft.ML.OnnxRuntime" Version="1.7.0" />
     <PackageReference Include="NumpyDotNet" Version="0.9.70" />
-    <PackageReference Include="protobuf-net" Version="3.0.73" />
   </ItemGroup>
 
 <!--  <Target Name="PreBuild" BeforeTargets="PreBuildEvent">-->
