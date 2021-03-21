@@ -113,50 +113,50 @@ namespace Onnx
         public static Dictionary<int, string> STORAGE_TENSOR_TYPE_TO_FIELD = new Dictionary<int, string> {
         {
             Convert.ToInt32(TensorProto.DataType.Float),
-            "float_data"},
+            "floatdatas"},
         {
             Convert.ToInt32(TensorProto.DataType.Int32),
-            "int32_data"},
+            "int32datas"},
         {
             Convert.ToInt32(TensorProto.DataType.Int64),
-            "int64_data"},
+            "int64datas"},
         {
             Convert.ToInt32(TensorProto.DataType.Uint16),
-            "int32_data"},
+            "int32datas"},
         {
             Convert.ToInt32(TensorProto.DataType.Double),
-            "double_data"},
+            "doubledatas"},
         {
             Convert.ToInt32(TensorProto.DataType.Complex64),
-            "float_data"},
+            "floatdatas"},
         {
             Convert.ToInt32(TensorProto.DataType.Complex128),
-            "double_data"},
+            "doubledatas"},
         {
             Convert.ToInt32(TensorProto.DataType.Uint32),
-            "uint64_data"},
+            "uint64datas"},
         {
             Convert.ToInt32(TensorProto.DataType.Uint64),
-            "uint64_data"},
+            "uint64datas"},
         {
             Convert.ToInt32(TensorProto.DataType.String),
-            "string_data"},
+            "stringdatas"},
         {
             Convert.ToInt32(TensorProto.DataType.Bool),
-            "int32_data"}};
+            "int32datas"}};
 
         public static Dictionary<int, string> STORAGE_ELEMENT_TYPE_TO_FIELD = new Dictionary<int, string> {
         {
             Convert.ToInt32(SequenceProto.DataType.Tensor),
-            "tensor_values"},
+            "tensorvalues"},
         {
             Convert.ToInt32(SequenceProto.DataType.SparseTensor),
-            "sparse_tensor_values"},
+            "sparsetensorvalues"},
         {
             Convert.ToInt32(SequenceProto.DataType.Sequence),
-            "sequence_values"},
+            "sequencevalues"},
         {
             Convert.ToInt32(SequenceProto.DataType.Map),
-            "map_values"}};
+            "mapvalues"}};
     }
 }
