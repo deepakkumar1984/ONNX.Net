@@ -7,6 +7,12 @@
     <PackageVersion>3.0.1</PackageVersion>
   </PropertyGroup>
 
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <LangVersion>9.0</LangVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <LangVersion>9.0</LangVersion>
+  </PropertyGroup>
   <ItemGroup>
     <Compile Remove="Models1\onnx-data.cs" />
     <Compile Remove="Models1\onnx-ml.cs" />
@@ -26,6 +32,7 @@
   <ItemGroup>
     <Folder Include="Models1\" />
     <Folder Include="Models\" />
+    <Folder Include="Native\" />
   </ItemGroup>
 
   <ItemGroup>
