@@ -1,12 +1,51 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Runtime.InteropServices;
 
 namespace Onnx
 {
+    [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Ansi)]
+    public struct OpSchemaStruct
+    {
+        public string file;
+
+        public int line;
+
+        public int support_level;
+
+        public string doc;
+
+        public int since_version;
+
+        public bool deprecated;
+
+        public string domain;
+
+        public string name;
+
+        public int min_input;
+
+        public int max_input;
+
+        public int min_output;
+
+        public int max_output;
+
+        public IntPtr attributes;
+
+        public IntPtr inputs;
+
+        public IntPtr outputs;
+
+        public IntPtr type_constraints;
+
+        public bool has_type_and_shape_inference_function;
+    }
+
     public class OpSchema
     {
-        
-    public string file { get; set; }
+
+        public string file { get; set; }
 
         public int line { get; set; }
 
@@ -32,9 +71,9 @@ namespace Onnx
 
         public Dictionary<string, Attribute> attributes { get; set; }
 
-        public FormalParameter[] inputs{ get; set; }
+        public FormalParameter[] inputs { get; set; }
 
-        public FormalParameter[]  outputs { get; set; }
+        public FormalParameter[] outputs { get; set; }
 
         public TypeConstraintParam[] type_constraints { get; set; }
 

@@ -1,6 +1,22 @@
 ﻿using System;
+using System.Runtime.InteropServices;
+
 namespace Onnx
 {
+    [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Ansi)]
+    public struct AttributeStruct
+    {
+        public string name;
+
+        public string description;
+
+        public int type;
+
+        public IntPtr default_value;
+
+        public bool required;
+    }
+
     public class Attribute
     {
         public Attribute()

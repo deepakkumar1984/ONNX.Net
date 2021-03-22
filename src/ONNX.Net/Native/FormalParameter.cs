@@ -1,6 +1,26 @@
 ﻿using System;
+using System.Runtime.InteropServices;
+
 namespace Onnx
 {
+    [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Ansi)]
+    public struct FormalParameterStruct
+    {
+        public string name;
+
+        public IntPtr types;
+
+        public string typeStr;
+
+        public string description;
+
+        public int option;
+
+        public bool isHomogeneous;
+
+        public int differentiationCategory;
+    }
+
     public class FormalParameter
     {
         public FormalParameter()
