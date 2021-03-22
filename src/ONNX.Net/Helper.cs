@@ -103,8 +103,8 @@ namespace Onnx
         {
             var node = new NodeProto();
             node.OpType = op_type;
-            node.Inputs.AddRange(inputs);
-            node.Outputs.AddRange(outputs);
+            node.Input.AddRange(inputs);
+            node.Output.AddRange(outputs);
             if (name != null)
                 node.Name = name;
 
@@ -118,7 +118,7 @@ namespace Onnx
             {
                 foreach (var (k, v) in kwargs)
                 {
-                    node.Attributes.Add(MakeAttribute(k, v));
+                    node.Attribute.Add(MakeAttribute(k, v));
                 }
             }
 
@@ -154,13 +154,13 @@ namespace Onnx
                 value_info = new ValueInfoProto[0];
 
             var graph = new GraphProto();
-            graph.Nodes.AddRange(nodes);
+            graph.Node.AddRange(nodes);
             graph.Name = name;
-            graph.Inputs.AddRange(inputs);
-            graph.Outputs.AddRange(outputs);
-            graph.Initializers.AddRange(initializer);
-            graph.SparseInitializers.AddRange(sparse_initializer);
-            graph.ValueInfoes.AddRange(value_info);
+            graph.Input.AddRange(inputs);
+            graph.Output.AddRange(outputs);
+            graph.Initializer.AddRange(initializer);
+            graph.SparseInitializer.AddRange(sparse_initializer);
+            graph.ValueInfo.AddRange(value_info);
             if (doc_string != null)
                 graph.DocString = doc_string;
 
@@ -190,11 +190,11 @@ namespace Onnx
 
             if (opset_imports != null)
             {
-                model.OpsetImports.AddRange(opset_imports);
+                model.OpsetImport.AddRange(opset_imports);
             }
             else
             {
-                model.OpsetImports.Add(new OperatorSetIdProto() { Version = Defs.OnnxOpsetVersion() });
+                model.OpsetImport.Add(new OperatorSetIdProto() { Version = Defs.OnnxOpsetVersion() });
             }
 
             foreach (var (k, v) in kwargs)
@@ -231,7 +231,7 @@ namespace Onnx
 
         public static void SetModelProps(ModelProto model, Dictionary<string, string> dict_value)
         {
-            model.MetadataProps.Remove(model.MetadataProps.Find(x=>x.Key == ":"));
+            model.MetadataProps.Remove(model.MetadataProps.FirstOrDefault(x=>x.Key == ":"));
             foreach (var (k, v) in dict_value)
             {
                 model.MetadataProps.Add(new StringStringEntryProto() { Key = k, Value = v });
@@ -246,16 +246,16 @@ namespace Onnx
 
         public static TensorProto MakeTensor(
                                             string name,
-                                            TensorProto.DataType data_type,
+                                            TensorProto.Types.DataType data_type,
                                             int[] dims,
                                             Array vals,
                                             bool raw = false)
         {
             // type: (...) -> TensorProto
             var tensor = new TensorProto();
-            tensor.data_type = (int)data_type;
+            tensor.DataType = (int)data_type;
             tensor.Name = name;
-            if (data_type == TensorProto.DataType.String)
+            if (data_type == TensorProto.Types.DataType.String)
             {
                 Debug.Assert(!raw, "Can not use raw_data to store string type");
             }
@@ -272,39 +272,39 @@ namespace Onnx
                 throw new Exception("Number of values does not match tensor's size.");
             }
 
-            if (data_type == TensorProto.DataType.Complex64 || data_type == TensorProto.DataType.Complex128)
+            if (data_type == TensorProto.Types.DataType.Complex64 || data_type == TensorProto.Types.DataType.Complex128)
             {
                 vals = SplitComplexToPairs(vals.OfType<Complex>().ToArray());
             }
 
             if (raw)
             {
-                tensor.RawData = vals.OfType<byte>().ToArray();
+                tensor.RawData = ByteString.CopyFrom(vals.OfType<byte>().ToArray());
             }
-            else if(Mapping.TENSOR_TYPE_TO_STORAGE_TENSOR_TYPE[(int)data_type] == (int)TensorProto.DataType.Double)
+            else if(Mapping.TENSOR_TYPE_TO_STORAGE_TENSOR_TYPE[(int)data_type] == (int)TensorProto.Types.DataType.Double)
             {
-                tensor.DoubleDatas = vals.OfType<double>().ToArray();
+                tensor.DoubleData.AddRange(vals.OfType<double>().ToArray());
             }
-            else if (Mapping.TENSOR_TYPE_TO_STORAGE_TENSOR_TYPE[(int)data_type] == (int)TensorProto.DataType.Float)
+            else if (Mapping.TENSOR_TYPE_TO_STORAGE_TENSOR_TYPE[(int)data_type] == (int)TensorProto.Types.DataType.Float)
             {
-                tensor.FloatDatas = vals.OfType<float>().ToArray();
+                tensor.FloatData.AddRange(vals.OfType<float>().ToArray());
             }
-            else if (Mapping.TENSOR_TYPE_TO_STORAGE_TENSOR_TYPE[(int)data_type] == (int)TensorProto.DataType.Int32)
+            else if (Mapping.TENSOR_TYPE_TO_STORAGE_TENSOR_TYPE[(int)data_type] == (int)TensorProto.Types.DataType.Int32)
             {
-                tensor.Int32Datas = vals.OfType<int>().ToArray();
+                tensor.Int32Data.AddRange(vals.OfType<int>().ToArray());
             }
-            else if (Mapping.TENSOR_TYPE_TO_STORAGE_TENSOR_TYPE[(int)data_type] == (int)TensorProto.DataType.Int64)
+            else if (Mapping.TENSOR_TYPE_TO_STORAGE_TENSOR_TYPE[(int)data_type] == (int)TensorProto.Types.DataType.Int64)
             {
-                tensor.Int64Datas = vals.OfType<long>().ToArray();
+                tensor.Int64Data.AddRange(vals.OfType<long>().ToArray());
             }
-            else if (Mapping.TENSOR_TYPE_TO_STORAGE_TENSOR_TYPE[(int)data_type] == (int)TensorProto.DataType.Uint64)
+            else if (Mapping.TENSOR_TYPE_TO_STORAGE_TENSOR_TYPE[(int)data_type] == (int)TensorProto.Types.DataType.Uint64)
             {
-                tensor.Uint64Datas = vals.OfType<ulong>().ToArray();
+                tensor.Uint64Data.AddRange(vals.OfType<ulong>().ToArray());
             }
 
             var tensorDims = tensor.Dims.ToList();
             tensorDims.AddRange(dims.Select(x=>(long)x));
-            tensor.Dims = tensorDims.ToArray();
+            tensor.Dims.AddRange(tensorDims.ToArray());
             return tensor;
         }
 
@@ -315,10 +315,11 @@ namespace Onnx
             sparse.Indices = indices;
             var sparseDims = sparse.Dims.ToList();
             sparseDims.AddRange(dims.Select(x => (long)x));
-            sparse.Dims = sparseDims.ToArray();
+            sparse.Dims.Add(sparseDims);
             return sparse;
         }
 
+#if ONNX_ML
         public static SequenceProto MakeSequence<T>(string name, int elem_type, List<T> values)
         {
             var sequence = new SequenceProto();
@@ -329,29 +330,29 @@ namespace Onnx
             return sequence;
         }
 
-        public static MapProto MakeMap(string name, TensorProto.DataType key_type, Array keys, SequenceProto values)
+        public static MapProto MakeMap(string name, TensorProto.Types.DataType key_type, Array keys, SequenceProto values)
         {
             var map = new MapProto();
-            var valid_key_int_types = new TensorProto.DataType[]
+            var valid_key_int_types = new TensorProto.Types.DataType[]
                                         {
-                                            TensorProto.DataType.Int8, TensorProto.DataType.Int16, TensorProto.DataType.Int32,
-                                            TensorProto.DataType.Int64, TensorProto.DataType.Uint8, TensorProto.DataType.Uint16,
-                                            TensorProto.DataType.Uint32, TensorProto.DataType.Uint64
+                                            TensorProto.Types.DataType.Int8, TensorProto.Types.DataType.Int16, TensorProto.Types.DataType.Int32,
+                                            TensorProto.Types.DataType.Int64, TensorProto.Types.DataType.Uint8, TensorProto.Types.DataType.Uint16,
+                                            TensorProto.Types.DataType.Uint32, TensorProto.Types.DataType.Uint64
                                         };
             map.Name = name;
             map.KeyType = (int)key_type;
-            if (key_type == TensorProto.DataType.String)
-                map.StringKeys.AddRange(keys.OfType<string>().Select(x => (Encoding.UTF8.GetBytes(x))));
+            if (key_type == TensorProto.Types.DataType.String)
+                map.StringKeys.AddRange(keys.OfType<string>().Select(x => ByteString.CopyFrom(Encoding.UTF8.GetBytes(x))));
             else if (valid_key_int_types.Contains(key_type))
-                map.Keys = keys.OfType<long>().ToArray();
+                map.Keys.Add(keys.OfType<long>());
 
             map.Values = values;
             return map;
         }
-
-        private static byte[] _to_bytes(string val)
+#endif
+        private static ByteString _to_bytes(string val)
         {
-            return Encoding.UTF8.GetBytes(val);
+            return ByteString.CopyFrom(Encoding.UTF8.GetBytes(val));
         }
 
         public static AttributeProto MakeAttribute(string key, object value, string doc_string= null)
@@ -370,65 +371,65 @@ namespace Onnx
             if (value is float)
             {
                 attr.F = Convert.ToSingle(value);
-                attr.Type = AttributeProto.AttributeType.Float;
+                attr.Type = AttributeProto.Types.AttributeType.Float;
             }
             else if (value is int)
             {
                 // integer
                 attr.I = Convert.ToInt32(value);
-                attr.Type = AttributeProto.AttributeType.Int;
+                attr.Type = AttributeProto.Types.AttributeType.Int;
             }
             else if (value is string)
             {
                 attr.S = _to_bytes(((string)value).ToString());
-                attr.Type = AttributeProto.AttributeType.String;
+                attr.Type = AttributeProto.Types.AttributeType.String;
             }
             else if (value is TensorProto)
             {
                 attr.T = (TensorProto)value;
-                attr.Type = AttributeProto.AttributeType.Tensor;
+                attr.Type = AttributeProto.Types.AttributeType.Tensor;
             }
             else if (value is SparseTensorProto)
             {
                 attr.SparseTensor = (SparseTensorProto)value;
-                attr.Type = AttributeProto.AttributeType.SparseTensor;
+                attr.Type = AttributeProto.Types.AttributeType.SparseTensor;
             }
             else if (value is GraphProto)
             {
                 attr.G = (GraphProto)value;
-                attr.Type = AttributeProto.AttributeType.Graph;
+                attr.Type = AttributeProto.Types.AttributeType.Graph;
             }
             else if (is_iterable)
             {
                 if(value.GetType().GetElementType().Name == "Int32")
                 {
-                    attr.Ints = ((int[])value).Select(x=>(long)x).ToArray();
-                    attr.Type = AttributeProto.AttributeType.Ints;
+                    attr.Ints.Add(((int[])value).Select(x=>(long)x));
+                    attr.Type = AttributeProto.Types.AttributeType.Ints;
                 }
                 else if (value.GetType().GetElementType().Name == "Single")
                 {
-                    attr.Floats = ((float[])value);
-                    attr.Type = AttributeProto.AttributeType.Floats;
+                    attr.Floats.Add((float[])value);
+                    attr.Type = AttributeProto.Types.AttributeType.Floats;
                 }
                 else if (value.GetType().GetElementType().Name == "String")
                 {
-                    attr.Strings.AddRange(((string[])value).Select(x => Encoding.UTF8.GetBytes(x)));
-                    attr.Type = AttributeProto.AttributeType.Strings;
+                    attr.Strings.AddRange(((string[])value).Select(x => ByteString.CopyFrom(Encoding.UTF8.GetBytes(x))));
+                    attr.Type = AttributeProto.Types.AttributeType.Strings;
                 }
                 else if (value.GetType().GetElementType().Name == "TensorProto")
                 {
                     attr.Tensors.AddRange((TensorProto[])value);
-                    attr.Type = AttributeProto.AttributeType.Tensors;
+                    attr.Type = AttributeProto.Types.AttributeType.Tensors;
                 }
                 else if (value.GetType().GetElementType().Name == "SparseTensorProto")
                 {
                     attr.SparseTensors.AddRange((SparseTensorProto[])value);
-                    attr.Type = AttributeProto.AttributeType.SparseTensors;
+                    attr.Type = AttributeProto.Types.AttributeType.SparseTensors;
                 }
                 else if (value.GetType().GetElementType().Name == "GraphProto")
                 {
                     attr.Graphs.AddRange((GraphProto[])value);
-                    attr.Type = AttributeProto.AttributeType.Graphs;
+                    attr.Type = AttributeProto.Types.AttributeType.Graphs;
                 }
                 else
                 {
@@ -445,43 +446,43 @@ namespace Onnx
 
         public static object GetAttributeValue(AttributeProto attr)
         {
-            if (attr.Type == AttributeProto.AttributeType.Float)
+            if (attr.Type == AttributeProto.Types.AttributeType.Float)
             {
                 return attr.F;
             }
-            if (attr.Type == AttributeProto.AttributeType.Int)
+            if (attr.Type == AttributeProto.Types.AttributeType.Int)
             {
                 return attr.I;
             }
-            if (attr.Type == AttributeProto.AttributeType.String)
+            if (attr.Type == AttributeProto.Types.AttributeType.String)
             {
                 return attr.S;
             }
-            if (attr.Type == AttributeProto.AttributeType.Tensor)
+            if (attr.Type == AttributeProto.Types.AttributeType.Tensor)
             {
                 return attr.T;
             }
-            if (attr.Type == AttributeProto.AttributeType.Graph)
+            if (attr.Type == AttributeProto.Types.AttributeType.Graph)
             {
                 return attr.G;
             }
-            if (attr.Type == AttributeProto.AttributeType.Floats)
+            if (attr.Type == AttributeProto.Types.AttributeType.Floats)
             {
                 return attr.Floats;
             }
-            if (attr.Type == AttributeProto.AttributeType.Ints)
+            if (attr.Type == AttributeProto.Types.AttributeType.Ints)
             {
                 return attr.Ints;
             }
-            if (attr.Type == AttributeProto.AttributeType.Strings)
+            if (attr.Type == AttributeProto.Types.AttributeType.Strings)
             {
-                return attr.Strings.Select(x=>Encoding.UTF8.GetString(x)).ToArray();
+                return attr.Strings.Select(x => Encoding.UTF8.GetString(x.ToByteArray())).ToArray();
             }
-            if (attr.Type == AttributeProto.AttributeType.Tensors)
+            if (attr.Type == AttributeProto.Types.AttributeType.Tensors)
             {
                 return attr.Tensors;
             }
-            if (attr.Type == AttributeProto.AttributeType.Graphs)
+            if (attr.Type == AttributeProto.Types.AttributeType.Graphs)
             {
                 return attr.Graphs;
             }
@@ -523,7 +524,7 @@ namespace Onnx
                 // difference is visible to our consumers, so make sure we emit
                 // an empty shape!
 
-                tensor_shape_proto.Dims.AddRange(new TensorShapeProto.Dimension[0]);
+                tensor_shape_proto.Dim.AddRange(new TensorShapeProto.Types.Dimension[0]);
 
             if (shape_denotation != null)
             {
@@ -533,7 +534,7 @@ namespace Onnx
                 for (int i = 0; i < shape.Length; i++)
                 {
                     var d = shape[i];
-                    var dim = new TensorShapeProto.Dimension();
+                    var dim = new TensorShapeProto.Types.Dimension();
                     if (d == null)
                         continue;
                     dim.DimParam = d;
@@ -543,7 +544,7 @@ namespace Onnx
                         dim.Denotation = shape_denotation[i];
                     }
 
-                    tensor_shape_proto.Dims.Add(dim);
+                    tensor_shape_proto.Dim.Add(dim);
                 }
             }
 
@@ -577,7 +578,7 @@ namespace Onnx
                 // difference is visible to our consumers, so make sure we emit
                 // an empty shape!
 
-                tensor_shape_proto.Dims.AddRange(new TensorShapeProto.Dimension[0]);
+                tensor_shape_proto.Dim.AddRange(new TensorShapeProto.Types.Dimension[0]);
 
             if (shape_denotation != null)
             {
@@ -587,7 +588,7 @@ namespace Onnx
                 for (int i = 0; i < shape.Length; i++)
                 {
                     var d = shape[i];
-                    var dim = new TensorShapeProto.Dimension();
+                    var dim = new TensorShapeProto.Types.Dimension();
                     
                     dim.DimValue = Convert.ToInt64(d);
 
@@ -596,7 +597,7 @@ namespace Onnx
                         dim.Denotation = shape_denotation[i];
                     }
 
-                    tensor_shape_proto.Dims.Add(dim);
+                    tensor_shape_proto.Dim.Add(dim);
                 }
             }
 
@@ -611,7 +612,20 @@ namespace Onnx
                                                     string[] elem_shape_denotation = null
                                                 )
         {
-            throw new NotImplementedException();
+            var value_info_proto = new ValueInfoProto();
+            value_info_proto.Name = name;
+            if (doc_string != null)
+                value_info_proto.DocString = doc_string;
+
+            var sequence_type_proto = value_info_proto.Type.SequenceType;
+            sequence_type_proto.ElemType.TensorType.ElemType = elem_type;
+
+            var tensor_value_info = MakeTensorValueInfo(name, elem_type, shape, doc_string, elem_shape_denotation);
+
+            if (shape != null)
+                sequence_type_proto.ElemType.TensorType.Shape = tensor_value_info.Type.TensorType.Shape;
+
+            return value_info_proto;
         }
 
         public static ValueInfoProto MakeSequenceValueInfo(
@@ -674,55 +688,55 @@ namespace Onnx
             // its name here and pass the graph itself up to the caller for later
             // printing.
             var graphs = new List<GraphProto>();
-            if (attr.Type == AttributeProto.AttributeType.Float)
+            if (attr.Type == AttributeProto.Types.AttributeType.Float)
             {
                 content.Add(attr.F.ToString());
             }
-            else if (attr.Type == AttributeProto.AttributeType.Int)
+            else if (attr.Type == AttributeProto.Types.AttributeType.Int)
             {
                 content.Add(attr.I.ToString());
             }
-            else if (attr.Type == AttributeProto.AttributeType.String)
+            else if (attr.Type == AttributeProto.Types.AttributeType.String)
             {
                 // TODO: Bit nervous about Python 2 / Python 3 determinism implications
-                content.Add(_sanitize_str(attr.S));
+                content.Add(_sanitize_str(attr.S.ToByteArray()));
             }
-            else if (attr.Type == AttributeProto.AttributeType.Tensor)
+            else if (attr.Type == AttributeProto.Types.AttributeType.Tensor)
             {
-                if (attr.T.Dims.Length > 0)
+                if (attr.T.Dims.Count > 0)
                 {
                     content.Add("<Tensor>");
                 }
                 else
                 {
                     // special case to print scalars
-                    var field = Mapping.STORAGE_TENSOR_TYPE_TO_FIELD[attr.T.data_type];
+                    var field = Mapping.STORAGE_TENSOR_TYPE_TO_FIELD[attr.T.DataType];
                     var fieldVal = attr.T.GetType().GetProperty(field).GetValue(attr.T);
                     content.Add($"<Scalar Tensor {fieldVal.ToString()}>");
                 }
             }
-            else if (attr.Type == AttributeProto.AttributeType.Graph)
+            else if (attr.Type == AttributeProto.Types.AttributeType.Graph)
             {
                 content.Add($"<graph {attr.G.Name}>");
                 graphs.Add(attr.G);
             }
-            else if (attr.Type == AttributeProto.AttributeType.Floats)
+            else if (attr.Type == AttributeProto.Types.AttributeType.Floats)
             {
                 content.Add(str_list(attr.Floats.Select(x => x.ToString()).ToArray()));
             }
-            else if (attr.Type == AttributeProto.AttributeType.Ints)
+            else if (attr.Type == AttributeProto.Types.AttributeType.Ints)
             {
                 content.Add(str_list(attr.Ints.Select(x => x.ToString()).ToArray()));
             }
-            else if (attr.Type == AttributeProto.AttributeType.Strings)
+            else if (attr.Type == AttributeProto.Types.AttributeType.Strings)
             {
-                content.Add(str_list(attr.Strings.Select(x => _sanitize_str(x)).ToArray()));
+                content.Add(str_list(attr.Strings.Select(x => _sanitize_str(x.ToByteArray())).ToArray()));
             }
-            else if (attr.Type == AttributeProto.AttributeType.Tensors)
+            else if (attr.Type == AttributeProto.Types.AttributeType.Tensors)
             {
                 content.Add("[<Tensor>, ...]");
             }
-            else if (attr.Type == AttributeProto.AttributeType.Graphs)
+            else if (attr.Type == AttributeProto.Types.AttributeType.Graphs)
             {
                 content.Add("[");
                 foreach (var _tup_1 in attr.Graphs.Select((_p_1, _p_2) => Tuple.Create(_p_2, _p_1)))
@@ -760,12 +774,12 @@ namespace Onnx
         {
             if (t.TensorType != null)
             {
-                var s = Enum.GetName(typeof(TensorProto.DataType), t.TensorType.ElemType);
+                var s = Enum.GetName(typeof(TensorProto.Types.DataType), t.TensorType.ElemType);
                 if (t.TensorType.Shape != null)
                 {
-                    if (t.TensorType.Shape.Dims.Count > 0)
+                    if (t.TensorType.Shape.Dim.Count > 0)
                     {
-                        s += string.Join("x", t.TensorType.Shape.Dims.Select(x => PrintableDim(x)));
+                        s += string.Join("x", t.TensorType.Shape.Dim.Select(x => PrintableDim(x)));
                     }
                     else
                     {
@@ -792,10 +806,10 @@ namespace Onnx
         public static string PrintableTensorProto(TensorProto t)
         {
             var s = $"%{t.Name}[";
-            s += Enum.GetName(typeof(TensorProto.DataType), t.data_type);
+            s += Enum.GetName(typeof(TensorProto.Types.DataType), t.DataType);
             if (t.Dims != null)
             {
-                if (t.Dims.Length > 0)
+                if (t.Dims.Count > 0)
                 {
                     s += (", " + string.Join("x", t.Dims));
                 }
@@ -812,16 +826,16 @@ namespace Onnx
         public static (string, GraphProto[]) PrintableNode(NodeProto node, string prefix= "", bool subgraphs= false)
         {
             var content = new List<string>();
-            if (node.Outputs.Count > 0)
+            if (node.Output.Count > 0)
             {
-                content.Add(string.Join(", ", (from name in node.Outputs
+                content.Add(string.Join(", ", (from name in node.Output
                                                select $"%{name}")));
                 content.Add("=");
             }
             // To deal with nested graphs
             var graphs = new List<GraphProto>();
             var printed_attrs = new List<string>();
-            foreach (var attr in node.Attributes)
+            foreach (var attr in node.Attribute)
             {
                 if (subgraphs)
                 {
@@ -837,9 +851,9 @@ namespace Onnx
             }
 
             var printed_attributes = string.Join(", ", printed_attrs.OrderBy(_p_1 => _p_1));
-            var printed_inputs = string.Join(", ", (from name in node.Inputs
+            var printed_inputs = string.Join(", ", (from name in node.Input
                                                     select $"%{name}"));
-            if (node.Attributes != null)
+            if (node.Attribute != null)
             {
                 content.Add($"{node.OpType}[{printed_attributes}]({printed_inputs})");
             }
@@ -867,14 +881,14 @@ namespace Onnx
                                 "graph",
                                 graph.Name
                             };
-            var initializers = (from t in graph.Initializers
+            var initializers = (from t in graph.Initializer
                                 select t.Name).ToHashSet().ToList();
-            if (graph.Inputs.Count > 0)
+            if (graph.Input.Count > 0)
             {
                 header.Add("(");
                 var in_strs = new List<string>();
                 var in_with_init_strs = new List<string>();
-                foreach (var inp in graph.Inputs)
+                foreach (var inp in graph.Input)
                 {
                     if (!initializers.Contains(inp.Name))
                     {
@@ -911,9 +925,9 @@ namespace Onnx
                 // so output the name, type and shape of those as well
                 if (in_with_init_strs.Count < initializers.Count)
                 {
-                    var graph_inputs = (from i in graph.Inputs
+                    var graph_inputs = (from i in graph.Input
                                         select i.Name).ToHashSet().ToList();
-                    var init_strs = (from i in graph.Initializers
+                    var init_strs = (from i in graph.Initializer
                                      where !graph_inputs.Contains(i.Name)
                                      select PrintableTensorProto(i)).ToList();
                     header.Add("initializers (");
@@ -931,7 +945,7 @@ namespace Onnx
             content.Add(prefix + string.Join(" ", header));
             var graphs = new List<GraphProto>();
             // body
-            foreach (var node in graph.Nodes)
+            foreach (var node in graph.Node)
             {
                 var (pn, gs) = PrintableNode(node, indent, subgraphs: true);
                 content.Add(pn);
@@ -942,9 +956,9 @@ namespace Onnx
                             "return"
                         };
 
-            if (graph.Outputs.Count > 0)
+            if (graph.Output.Count > 0)
             {
-                tail.Add(string.Join(", ", (from @out in graph.Outputs
+                tail.Add(string.Join(", ", (from @out in graph.Output
                                        select $"%{@out.Name}")));
             }
 
@@ -996,7 +1010,7 @@ namespace Onnx
             {
                 var k = _tup_1.Item1;
                 var v = _tup_1.Item2;
-                training_info.UpdateBindings.Add(new StringStringEntryProto() { Key = k,Value = v });
+                training_info.UpdateBinding.Add(new StringStringEntryProto() { Key = k,Value = v });
             }
             if (initialization != null)
             {
@@ -1008,7 +1022,7 @@ namespace Onnx
                 {
                     var k = _tup_2.Item1;
                     var v = _tup_2.Item2;
-                    training_info.UpdateBindings.Add(new StringStringEntryProto() { Key = k, Value = v });
+                    training_info.UpdateBinding.Add(new StringStringEntryProto() { Key = k, Value = v });
                 }
             }
 

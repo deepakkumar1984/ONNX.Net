@@ -145,6 +145,7 @@ namespace Onnx
             Convert.ToInt32(TensorProto.Types.DataType.Bool),
             "int32_data"}};
 
+#if ONNX_ML
         public static Dictionary<int, string> STORAGE_ELEMENT_TYPE_TO_FIELD = new Dictionary<int, string> {
         {
             Convert.ToInt32(SequenceProto.Types.DataType.Tensor),
@@ -157,6 +158,10 @@ namespace Onnx
             "sequence_values"},
         {
             Convert.ToInt32(SequenceProto.Types.DataType.Map),
-            "map_values"}};
+            "map_values"
+            }
+        };
+#endif
     }
+
 }

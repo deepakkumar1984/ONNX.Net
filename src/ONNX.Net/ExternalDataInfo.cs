@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Google.Protobuf;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -30,7 +31,7 @@ namespace Onnx
             this.checksum = null;
             this.basepath = "";
             attributes = new Dictionary<string, string>();
-            foreach (var entry in tensor.ExternalDatas) {
+            foreach (var entry in tensor.ExternalData) {
                 attributes.Add(entry.Key, entry.Value);
             }
         }
@@ -61,7 +62,7 @@ namespace Onnx
                     data_file.Read(bytes, 0, (int)data_file.Length);
                 }
 
-                tensor.RawData = bytes;
+                tensor.RawData = ByteString.CopyFrom(bytes);
             }
         }
 
@@ -71,9 +72,9 @@ namespace Onnx
                 if (UsesExternalData(tensor)) {
                     LoadExternalDataForTensor(tensor, base_dir);
                     // After loading raw_data from external_data, change the state of tensors
-                    tensor.data_location = TensorProto.DataLocation.Default;
+                    tensor.DataLocation = TensorProto.Types.DataLocation.Default;
                     // and remove external data
-                    tensor.ExternalDatas.Remove(tensor.ExternalDatas.Find(x => x.Key == ":"));
+                    tensor.ExternalData.Remove(tensor.ExternalData.FirstOrDefault(x => x.Key == ":"));
                 }
             }
         }
@@ -86,8 +87,8 @@ namespace Onnx
                 throw new Exception("Tensor " + tensor.Name + "does not have raw_data field. Cannot set external data for this tensor.");
             }
             
-            tensor.ExternalDatas.Remove(tensor.ExternalDatas.Find(x => x.Key == ":"));
-            tensor.data_location = TensorProto.DataLocation.External;
+            tensor.ExternalData.Remove(tensor.ExternalData.FirstOrDefault(x => x.Key == ":"));
+            tensor.DataLocation = TensorProto.Types.DataLocation.External;
             foreach (var _tup_1 in new Dictionary<string, object> {
             {
                 "location",
@@ -109,7 +110,7 @@ namespace Onnx
                 var v = _tup_1.Value;
                 if (v != null)
                 {
-                    tensor.ExternalDatas.Add(new StringStringEntryProto() { Key = k, Value = v.ToString() });
+                    tensor.ExternalData.Add(new StringStringEntryProto() { Key = k, Value = v.ToString() });
                 }
             }
         }
@@ -171,8 +172,8 @@ namespace Onnx
                         throw new Exception("raw_data field doesn't exist.");
                     }
 
-                    tensor.ExternalDatas.Remove(tensor.ExternalDatas.Find(x => x.Key == ":"));
-                    tensor.data_location = TensorProto.DataLocation.Default;
+                    tensor.ExternalData.Remove(tensor.ExternalData.FirstOrDefault(x => x.Key == ":"));
+                    tensor.DataLocation = TensorProto.Types.DataLocation.Default;
                 }
             }
         }
@@ -219,7 +220,7 @@ namespace Onnx
                 }
 
                 var offset = (int)data_file.Length;
-                data_file.Write(tensor.RawData);
+                data_file.Write(tensor.RawData.ToByteArray());
                 SetExternalData(tensor, info.location, offset, (int)data_file.Length - offset);
             }
         }
@@ -233,14 +234,14 @@ namespace Onnx
 
         private static IEnumerable<TensorProto> _get_initializer_tensors(ModelProto onnx_model_proto)
         {
-            return onnx_model_proto.Graph.Initializers;
+            return onnx_model_proto.Graph.Initializer;
         }
 
         private static IEnumerable<TensorProto> _get_attribute_tensors(ModelProto onnx_model_proto)
         {
-            foreach (var node in onnx_model_proto.Graph.Nodes)
+            foreach (var node in onnx_model_proto.Graph.Node)
             {
-                foreach (var attribute in node.Attributes)
+                foreach (var attribute in node.Attribute)
                 {
                     if (attribute.T != null)
                     {
@@ -267,18 +268,18 @@ namespace Onnx
 
         public static bool UsesExternalData(TensorProto tensor)
         {
-            return tensor.data_location == TensorProto.DataLocation.External;
+            return tensor.DataLocation == TensorProto.Types.DataLocation.External;
         }
 
         public static void RemoveExternalDataField(TensorProto tensor, string field_key)
         {
-            foreach (var _tup_1 in tensor.ExternalDatas.Select((_p_1, _p_2) => Tuple.Create(_p_2, _p_1)))
+            foreach (var _tup_1 in tensor.ExternalData.Select((_p_1, _p_2) => Tuple.Create(_p_2, _p_1)))
             {
                 var i = _tup_1.Item1;
                 var field = _tup_1.Item2;
                 if (field.Key == field_key)
                 {
-                    tensor.ExternalDatas.Remove(field);
+                    tensor.ExternalData.Remove(field);
                 }
             }
         }

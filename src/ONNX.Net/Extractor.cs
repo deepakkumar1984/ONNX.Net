@@ -21,8 +21,8 @@ namespace Onnx
         {
             this.model = ShapeInference.infer_shapes(model);
             this.graph = this.model.Graph;
-            this.wmap = this._build_name2obj_dict(this.graph.Initializers.ToArray());
-            this.vimap = this._build_name2obj_dict(this.graph.ValueInfoes.ToArray());
+            this.wmap = this._build_name2obj_dict(this.graph.Initializer.ToArray());
+            this.vimap = this._build_name2obj_dict(this.graph.ValueInfo.ToArray());
         }
 
         internal Dictionary<string, ValueInfoProto> _build_name2obj_dict(params ValueInfoProto[] objs)
@@ -71,12 +71,12 @@ namespace Onnx
 
         internal ValueInfoProto[] _collect_new_inputs(string[] names)
         {
-            return this._collect_new_io_core(this.graph.Inputs.ToArray(), names);
+            return this._collect_new_io_core(this.graph.Input.ToArray(), names);
         }
 
         internal ValueInfoProto[] _collect_new_outputs(string[] names)
         {
-            return this._collect_new_io_core(this.graph.Outputs.ToArray(), names);
+            return this._collect_new_io_core(this.graph.Output.ToArray(), names);
         }
 
         internal void _dfs_search_reachable_nodes(string node_output_name, string[] graph_input_names,
@@ -84,14 +84,14 @@ namespace Onnx
         {
             if (graph_input_names.Contains(node_output_name))
                 return;
-            foreach (var node in graph.Nodes)
+            foreach (var node in graph.Node)
             {
                 if (reachable_nodes.FirstOrDefault(x => x.Name == node.Name) != null)
                     continue;
-                if (node.Outputs.Contains(node_output_name))
+                if (node.Output.Contains(node_output_name))
                     continue;
                 reachable_nodes.Add(node);
-                foreach (var name in node.Inputs)
+                foreach (var name in node.Input)
                 {
                     this._dfs_search_reachable_nodes(name, graph_input_names, reachable_nodes);
                 }
@@ -107,7 +107,7 @@ namespace Onnx
                 this._dfs_search_reachable_nodes(name, input_names, reachable_nodes);
             }
 
-            foreach (var n in graph.Nodes)
+            foreach (var n in graph.Node)
             {
                 if (reachable_nodes.FirstOrDefault(x => x.Name == n.Name) != null)
                 {
@@ -123,12 +123,12 @@ namespace Onnx
             var all_tensors_name = new HashSet<string>();
             foreach (var node in nodes)
             {
-                foreach (var name in node.Inputs)
+                foreach (var name in node.Input)
                 {
                     all_tensors_name.Add(name);
                 }
 
-                foreach (var name in node.Outputs)
+                foreach (var name in node.Output)
                 {
                     all_tensors_name.Add(name);
                 }
@@ -148,8 +148,8 @@ namespace Onnx
                     value_info.Add(v);
             }
 
-            Debug.Assert(graph.SparseInitializers.Count == 0);
-            Debug.Assert(graph.QuantizationAnnotations.Count == 0);
+            Debug.Assert(graph.SparseInitializer.Count == 0);
+            Debug.Assert(graph.QuantizationAnnotation.Count == 0);
             return (initializer.ToArray(), value_info.ToArray());
         }
 
@@ -163,7 +163,7 @@ namespace Onnx
 
             var meta = new Dictionary<string, object>(){
                 { "ir_version", model.IrVersion},
-                {"opset_imports", model.OpsetImports },
+                {"opset_imports", model.OpsetImport },
                 { "producer_name", "Utils.ExtractModel"}
             };
 

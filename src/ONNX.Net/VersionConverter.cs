@@ -7,9 +7,7 @@ namespace Onnx
     {
         public static ModelProto ConvertVersion(ModelProto model, int target_version)
         {
-            IMessage m;
-            
-            var model_str = model.();
+            var model_str = model.ToByteArray();
             var converted_model_str = C.convert_version(model_str, target_version);
             return onnx.LoadModelFromString(converted_model_str);
         }

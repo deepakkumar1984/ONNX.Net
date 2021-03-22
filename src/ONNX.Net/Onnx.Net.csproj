@@ -9,43 +9,14 @@
 
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <LangVersion>9.0</LangVersion>
+    <DefineConstants>TRACE;ONNX_ML</DefineConstants>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <LangVersion>9.0</LangVersion>
   </PropertyGroup>
-  <ItemGroup>
-    <Compile Remove="Models1\onnx-data.cs" />
-    <Compile Remove="Models1\onnx-ml.cs" />
-    <Compile Remove="Models1\onnx-operators-ml.cs" />
-    <Compile Remove="PyRef\external_data_helper.py.cs" />
-    <Compile Remove="PyRef\gen_proto.py.cs" />
-    <Compile Remove="PyRef\helper.py.cs" />
-    <Compile Remove="PyRef\mapping.py.cs" />
-    <Compile Remove="PyRef\numpy_helper.py.cs" />
-    <Compile Remove="PyRef\onnx_pb.py.cs" />
-    <Compile Remove="PyRef\shape_inference.py.cs" />
-    <Compile Remove="PyRef\utils.py.cs" />
-    <Compile Remove="PyRef\version.py.cs" />
-    <Compile Remove="PyRef\version_converter.py.cs" />
-  </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Models1\" />
-    <Folder Include="Models\" />
     <Folder Include="Native\" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <None Include="PyRef\external_data_helper.py.cs" />
-    <None Include="PyRef\gen_proto.py.cs" />
-    <None Include="PyRef\helper.py.cs" />
-    <None Include="PyRef\mapping.py.cs" />
-    <None Include="PyRef\numpy_helper.py.cs" />
-    <None Include="PyRef\onnx_pb.py.cs" />
-    <None Include="PyRef\shape_inference.py.cs" />
-    <None Include="PyRef\utils.py.cs" />
-    <None Include="PyRef\version.py.cs" />
-    <None Include="PyRef\version_converter.py.cs" />
   </ItemGroup>
 
   <ItemGroup>

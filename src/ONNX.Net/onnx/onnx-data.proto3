@@ -82,7 +82,7 @@ message MapProto {
   // All MapProto data types must have the same length of keys and values.
 
   // The data type of the key.
-  // This field MUST have a valid TensorProto.DataType value of
+  // This field MUST have a valid TensorProto.Types.DataType value of
   // INT8, INT16, INT32, INT64, UINT8, UINT16, UINT32, UINT64, or STRING
   int32 key_type = 2;
 
