@@ -31,13 +31,15 @@ namespace Onnx
 
         public int max_output;
 
-        public IntPtr attributes;
+        public string[] attributesKeys;
 
-        public IntPtr inputs;
+        public AttributeStruct[] attributesValues;
 
-        public IntPtr outputs;
+        public FormalParameterStruct[] inputs;
 
-        public IntPtr type_constraints;
+        public FormalParameterStruct[] outputs;
+
+        public TypeConstraintParamStruct[] type_constraints;
 
         public bool has_type_and_shape_inference_function;
     }

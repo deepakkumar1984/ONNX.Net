@@ -8,7 +8,7 @@ namespace Onnx
     {
         public string name;
 
-        public IntPtr types;
+        public string[] types;
 
         public string typeStr;
 
