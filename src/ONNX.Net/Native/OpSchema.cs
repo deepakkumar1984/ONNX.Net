@@ -4,43 +4,29 @@ using System.Runtime.InteropServices;
 
 namespace Onnx
 {
-    [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Ansi)]
+    [StructLayout(LayoutKind.Sequential)]
     public struct OpSchemaStruct
     {
-        public string file;
-
+        public IntPtr file;
         public int line;
-
         public int support_level;
-
-        public string doc;
-
+        public IntPtr doc;
         public int since_version;
-
         public bool deprecated;
-
-        public string domain;
-
-        public string name;
-
+        public IntPtr domain;
+        public IntPtr name;
         public int min_input;
-
         public int max_input;
-
         public int min_output;
-
         public int max_output;
-
-        public string[] attributesKeys;
-
-        public AttributeStruct[] attributesValues;
-
-        public FormalParameterStruct[] inputs;
-
-        public FormalParameterStruct[] outputs;
-
-        public TypeConstraintParamStruct[] type_constraints;
-
+        public IntPtr attributesKeys;
+        public IntPtr attributesValues;
+        public IntPtr inputs;
+        public int inputs_length;
+        public IntPtr outputs;
+        public int outputs_length;
+        public IntPtr type_constraints;
+        public int type_constraints_length;
         public bool has_type_and_shape_inference_function;
     }
 

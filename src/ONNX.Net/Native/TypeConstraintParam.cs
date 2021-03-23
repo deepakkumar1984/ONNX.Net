@@ -10,7 +10,7 @@ namespace Onnx
 
         public string description;
 
-        public IntPtr allowed_type_strs;
+        public string[] allowed_type_strs;
     }
 
     public class TypeConstraintParam

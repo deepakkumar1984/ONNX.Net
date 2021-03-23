@@ -14,7 +14,15 @@ namespace ScratchPad
             {
                 var ptr = NativeMethods.CS_get_schema("Add", 14, "");
 
-                //var opSchema = Marshal.PtrToStructure<OpSchemaStruct>(ptr);
+                FormalParameterStruct[] inputs = new FormalParameterStruct[ptr.inputs_length];
+                var size = Marshal.SizeOf(typeof(FormalParameterStruct));
+                long LongPtr = ptr.inputs.ToInt64();
+                for (int i = 0; i < ptr.inputs_length; i++)
+                {
+                    var localPtr = new IntPtr(LongPtr);
+                    Marshal.StructureToPtr(inputs[i], localPtr, false);
+                    LongPtr += size;
+                }
             }
         }
     }

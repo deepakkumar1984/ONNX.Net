@@ -3,16 +3,16 @@ using System.Runtime.InteropServices;
 
 namespace Onnx
 {
-    [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Ansi)]
+    [StructLayout(LayoutKind.Sequential)]
     public struct FormalParameterStruct
     {
-        public string name;
+        public IntPtr name;
 
-        public string[] types;
+        public IntPtr types;
 
-        public string typeStr;
+        public IntPtr typeStr;
 
-        public string description;
+        public IntPtr description;
 
         public int option;
 
