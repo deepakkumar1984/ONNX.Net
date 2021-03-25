@@ -16,7 +16,7 @@ namespace Onnx
 
         public int option;
 
-        public bool isHomogeneous;
+        public int isHomogeneous;
 
         public int differentiationCategory;
     }

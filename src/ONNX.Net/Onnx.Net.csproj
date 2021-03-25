@@ -5,6 +5,7 @@
     <RootNamespace>Onnx</RootNamespace>
     <AssemblyName>Onnx.Net</AssemblyName>
     <PackageVersion>3.0.1</PackageVersion>
+    <Platforms>AnyCPU;x64</Platforms>
   </PropertyGroup>
 
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
@@ -12,7 +13,16 @@
     <DefineConstants>TRACE;ONNX_ML</DefineConstants>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <LangVersion>9.0</LangVersion>
+    <DefineConstants>TRACE;ONNX_ML</DefineConstants>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+  </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <LangVersion>9.0</LangVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LangVersion>9.0</LangVersion>
   </PropertyGroup>
 

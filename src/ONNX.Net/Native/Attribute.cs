@@ -3,18 +3,18 @@ using System.Runtime.InteropServices;
 
 namespace Onnx
 {
-    [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Ansi)]
+    [StructLayout(LayoutKind.Sequential)]
     public struct AttributeStruct
     {
-        public string name;
+        public unsafe char* name;
 
-        public string description;
+        public unsafe char* description;
 
         public int type;
 
-        public IntPtr default_value;
+        public unsafe char* default_value;
 
-        public bool required;
+        public int required;
     }
 
     public class Attribute

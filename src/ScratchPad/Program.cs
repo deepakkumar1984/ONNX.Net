@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
+using System.Text;
 
 namespace ScratchPad
 {
@@ -10,19 +11,46 @@ namespace ScratchPad
         static void Main(string[] args)
         {
             SchemaMapVersionList map = new SchemaMapVersionList();
-            if (NativeMethods.CS_has_schema("Add", ""))
+            if (NativeMethods.CS_has_schema("Conv", ""))
             {
-                var ptr = NativeMethods.CS_get_schema("Add", 14, "");
-
-                FormalParameterStruct[] inputs = new FormalParameterStruct[ptr.inputs_length];
-                var size = Marshal.SizeOf(typeof(FormalParameterStruct));
-                long LongPtr = ptr.inputs.ToInt64();
-                for (int i = 0; i < ptr.inputs_length; i++)
+                unsafe
                 {
-                    var localPtr = new IntPtr(LongPtr);
-                    Marshal.StructureToPtr(inputs[i], localPtr, false);
-                    LongPtr += size;
+                    var ptr = NativeMethods.CS_get_schema("Conv", 14, "");
+
+                    if (ptr.has_function == 1)
+                    {
+                        string function_body = Marshal.PtrToStringAnsi((IntPtr)ptr.function_body);
+                    }
+
+                    string[] attrKeys = new string[ptr.attributes_length];
+                    AttributeStruct[] attrValues = new AttributeStruct[ptr.attributes_length];
+
+                    for(int i = 0; i < ptr.attributes_length; i++)
+                    {
+                        attrKeys[i] = Marshal.PtrToStringAnsi((IntPtr)ptr.attributesKeys[i]);
+                        attrValues[i] = ptr.attributesValues[i];
+                        var proto = AttributeProto.Parser.ParseFrom(Encoding.ASCII.GetBytes(Marshal.PtrToStringAnsi((IntPtr)attrValues[i].default_value)));
+                    }
+
+                    FormalParameterStruct[] inputs = new FormalParameterStruct[ptr.inputs_length];
+                    for (int i = 0; i < ptr.inputs_length; i++)
+                    {
+                        inputs[i] = ptr.inputs[i];
+                    }
+
+                    FormalParameterStruct[] outputs = new FormalParameterStruct[ptr.outputs_length];
+                    for (int i = 0; i < ptr.outputs_length; i++)
+                    {
+                        outputs[i] = ptr.outputs[i];
+                    }
+
+                    TypeConstraintParamStruct[] constraints = new TypeConstraintParamStruct[ptr.type_constraints_length];
+                    for (int i = 0; i < ptr.type_constraints_length; i++)
+                    {
+                        constraints[i] = ptr.type_constraints[i];
+                    }
                 }
+                
             }
         }
     }

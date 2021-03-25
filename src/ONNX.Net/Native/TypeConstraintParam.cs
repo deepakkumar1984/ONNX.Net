@@ -3,14 +3,16 @@ using System.Runtime.InteropServices;
 
 namespace Onnx
 {
-    [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Ansi)]
+    [StructLayout(LayoutKind.Sequential)]
     public struct TypeConstraintParamStruct
     {
-        public string type_param_str;
+        public unsafe char* type_param_str;
 
-        public string description;
+        public unsafe char* description;
 
-        public string[] allowed_type_strs;
+        public unsafe char** allowed_type_strs;
+
+        public int allowed_type_strs_length;
     }
 
     public class TypeConstraintParam
